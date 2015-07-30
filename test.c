@@ -10,6 +10,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <math.h>
+
+int pusher_send_fd;
+
+#define BRIGHTNESS 127
 
 static void fill_pusher_address(struct sockaddr_in * dest, int i) {
     memset(dest, 0, sizeof *dest);
@@ -21,13 +26,21 @@ static void fill_pusher_address(struct sockaddr_in * dest, int i) {
                  | registry.pushers[i].last_broadcast.ip[0];
 }
 
+static void send_to_pusher(void * buf, size_t n, int i) {
+    struct sockaddr_in dest;
+    fill_pusher_address(&dest, i);
+    if (sendto(pusher_send_fd, buf, n, 0, (const struct sockaddr *)&dest, sizeof dest) < 0) {
+        perror("sendto");
+        exit(1);
+    }
+}
 
 int main() {
-    struct sockaddr_in dest;
-    uint8_t buf[2000];
+    uint8_t buf[((240*3) + 1) * 2 + 4];
     int i;
-    int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (fd < 0) {
+    float idx = 0;
+    pusher_send_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (pusher_send_fd < 0) {
         perror("socket");
         exit(1);
     }
@@ -37,17 +50,22 @@ int main() {
     while (!registry.num_pushers) registry_wait();
 
     printf("Found pusher " MAC_FMT "\n", MAC_FMT_ARGS(registry.pushers[0].last_broadcast.mac));
-    fill_pusher_address(&dest, 0);
 
     memset(buf, 0, sizeof buf);
-    for (i = 0; i < 24; i++) {
-        buf[5 + (9*i)] = 50;
-        buf[5 + (9*i) + 4] = 50;
-        buf[5 + (9*i) + 8] = 50;
-    }
-    printf("sending to %s\n", inet_ntoa(dest.sin_addr));
-    if (sendto(fd, buf, 846, 0, (const struct sockaddr *)&dest, sizeof dest) < 0) {
-        perror("sendto");
-        exit(1);
+    buf[4] = 0;
+    buf[725] = 1;
+
+    while (1) {
+        float bidx = idx;
+        for (i = 0; i < 240; i++) {
+            buf[5 + (3*i) + 0] = ((sin(bidx) + 1) / 2) * BRIGHTNESS;
+            buf[5 + (3*i) + 1] = ((sin(bidx + M_PI*2.0/3.0) + 1) / 2) * BRIGHTNESS;
+            buf[5 + (3*i) + 2] = ((sin(bidx + M_PI*4.0/3.0) + 1) / 2) * BRIGHTNESS;
+            bidx += .2;
+        }
+        idx += .1;
+        send_to_pusher(buf, sizeof buf, 0);
+
+        usleep(16667);
     }
 }
