@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "registry.h"
+#include "pattern.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -35,33 +36,6 @@ static void send_to_pusher(void * buf, size_t n, int i) {
     }
 }
 
-typedef struct rgb {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} __attribute__((packed)) rgb_t;
-
-rgb_t blink(int pixel_number, double beat_counter) {
-    rgb_t out = {0, 0, 0};
-    double phase = fmod(beat_counter, 1.0);
-    (void)pixel_number;
-    if (phase < .1 && ((int)beat_counter % 12) == (pixel_number % 13)) {
-        if (pixel_number % 3 == 0) out.r = 10;
-        else if (pixel_number % 3 == 1) out.g = 10;
-        else out.b = 10;
-    }
-    return out;
-}
-
-rgb_t simple_rainbow(int pixel_number, double beat_counter) {
-    float theta = -(pixel_number * .2) + beat_counter;
-    rgb_t out = {0, 0, 0};
-    out.r = ((sin2(theta) + 1) / 2) * BRIGHTNESS;
-    out.g = ((sin2(theta + M_PI*2.0/3.0) + 1) / 2) * BRIGHTNESS;
-    out.b = ((sin2(theta + M_PI*4.0/3.0) + 1) / 2) * BRIGHTNESS;
-    return out;
-}
-
 int main() {
     uint8_t buf[((240*3) + 1) * 2 + 4];
     int i;
@@ -84,7 +58,7 @@ int main() {
 
     while (1) {
         for (i = 0; i < 240; i++) {
-            rgb_t pixel = simple_rainbow(i, idx);
+            rgb_t pixel = pattern_arr[1].func(i, idx);
             buf[5 + (3*i) + 0] = pixel.r;
             buf[5 + (3*i) + 1] = pixel.g;
             buf[5 + (3*i) + 2] = pixel.b;

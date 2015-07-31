@@ -1,2 +1,8 @@
-test: test.c registry.c wire.h
-	cc -std=c89 -ansi -pedantic -Wall -Wextra test.c registry.c -o test
+SRCS=pattern.c registry.c sample_patterns.c
+HDRS=wire.h pattern.h
+
+preview-test: $(SRCS) $(HDRS) preview-test.c
+	cc -std=c89 -ansi -pedantic -Wall -Wextra $(SRCS) preview-test.c -o $@ -F/Library/Frameworks -framework SDL2 -framework Cocoa -framework OpenGL
+
+pusher-test: $(SRCS) $(HDRS) pusher-test.c
+	cc -std=c89 -ansi -pedantic -Wall -Wextra $(SRCS) pusher-test.c -o $@
