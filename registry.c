@@ -46,10 +46,10 @@ static void registry_receive_broadcast(void * buf, int len) {
     (void)len;
 
     printf("MAC " MAC_FMT ", IP %d.%d.%d.%d, dev id %d, protocol %d, hardware rev %d, "
-           "software rev %d, link %d bps, %d pixels/strip, port %d, %d strips/packet\n",
+           "software rev %d, link %d bps, %d pixels/strip, %d strips, port %d, %d strips/packet\n",
         MAC_FMT_ARGS(pb->mac), (int)pb->ip[0], (int)pb->ip[1], (int)pb->ip[2], (int)pb->ip[3],
         (int)pb->device_type, (int)pb->protocol, (int)pb->hardware_rev, (int)pb->software_rev,
-        (int)pb->link_speed, (int)pb->pixels_per_strip, (int)pb->my_port, (int)pb->max_strips_per_packet
+        (int)pb->link_speed, (int)pb->pixels_per_strip, (int)pb->strips_attached, (int)pb->my_port, (int)pb->max_strips_per_packet
     );
 
     registry_lock();

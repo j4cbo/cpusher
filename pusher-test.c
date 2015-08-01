@@ -29,19 +29,53 @@ static void fill_pusher_address(struct sockaddr_in * dest, int i) {
                  | registry.pushers[i].last_broadcast.ip[0];
 }
 
-static void send_to_pusher(void * buf, size_t n, int i) {
+static void send_pattern_to_pusher(int pusher, int pattern, float idx, int *pixel_ptr /*inout*/) {
+    const struct pusher_broadcast *pb = &registry.pushers[pusher].last_broadcast;
+    char buffer[1536];
+    int strip = 0;
+    int pixel = *pixel_ptr;
+    int computed_spp = ((sizeof buffer) - 4) / (pb->pixels_per_strip * 3 + 1);
+    int max_strips_per_packet = pb->max_strips_per_packet;
     struct sockaddr_in dest;
-    fill_pusher_address(&dest, i);
-    if (sendto(pusher_send_fd, buf, n, 0, (const struct sockaddr *)&dest, sizeof dest) < 0) {
-        perror("sendto");
-        exit(1);
+    size_t this_packet_size;
+    fill_pusher_address(&dest, pusher);
+
+    if (max_strips_per_packet > computed_spp) {
+        max_strips_per_packet = computed_spp;
     }
+
+    buffer[0] = buffer[1] = buffer[2] = buffer[3] = 0;
+
+    while (strip < pb->strips_attached) {
+        /* Build a packet */
+        int strip_in_packet = 0;
+        while (strip_in_packet < max_strips_per_packet && strip < pb->strips_attached) {
+            int i;
+            int buffer_offset = 4 + (pb->pixels_per_strip * 3 + 1) * strip_in_packet;
+            buffer[buffer_offset] = strip;
+            for (i = 0; i < pb->pixels_per_strip; i++) {
+                rgb_t rgb = pattern_arr[pattern].func(pixel++, idx);
+                buffer[buffer_offset + 1 + 3*i] = rgb.r;
+                buffer[buffer_offset + 2 + 3*i] = rgb.g;
+                buffer[buffer_offset + 3 + 3*i] = rgb.b;
+            }
+
+            strip++;
+            strip_in_packet++;
+        }
+
+        this_packet_size = 4 + strip_in_packet * (pb->pixels_per_strip * 3 + 1);
+        if (sendto(pusher_send_fd, buffer, this_packet_size, 0, (const struct sockaddr *)&dest, sizeof dest) < 0) {
+            perror("sendto");
+        }
+    }
+
+    *pixel_ptr = pixel;
 }
 
 int main() {
-    uint8_t buf[((240*3) + 1) * 2 + 4];
-    int i;
     float idx = 0;
+    int pixel;
     pusher_send_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (pusher_send_fd < 0) {
         perror("socket");
@@ -53,25 +87,14 @@ int main() {
     while (!registry.num_pushers) registry_wait();
 
     printf("Found pusher " MAC_FMT "\n", MAC_FMT_ARGS(registry.pushers[0].last_broadcast.mac));
-
-    memset(buf, 0, sizeof buf);
-    buf[4] = 0;
-    buf[725] = 1;
-
     while (1) {
-        for (i = 0; i < 240; i++) {
-            rgb_t pixel = pattern_arr[1].func(i, idx);
-            buf[5 + (3*i) + 0] = pixel.r;
-            buf[5 + (3*i) + 1] = pixel.g;
-            buf[5 + (3*i) + 2] = pixel.b;
-        }
+        pixel = 0;
+        send_pattern_to_pusher(0 /*pusher*/, 1 /*pattern*/, idx, &pixel);
 
         /* we run at 60 Hz, so there are 3600 frames per minute
          * beat clock is 138 bpm, so there are 3600 / 138 frames per beat
          */
         idx += (138 / 3600.0);
-
-        send_to_pusher(buf, sizeof buf, 0);
 
         usleep(16667);
     }
