@@ -15,6 +15,7 @@
  */
 struct pusher_info {
     struct pusher_broadcast last_broadcast;
+    uint32_t id;
     time_t last_seen;
 };
 

@@ -65,8 +65,6 @@ static void registry_receive_broadcast(void * buf, int len) {
         }
     }
 
-    printf("Found new pusher " MAC_FMT "\n", MAC_FMT_ARGS(pb->mac));
-
     if (registry.num_pushers == registry_pushers_allocated) {
         registry_pushers_allocated *= 2;
         registry.pushers = realloc(registry.pushers,
@@ -76,6 +74,9 @@ static void registry_receive_broadcast(void * buf, int len) {
     i = registry.num_pushers;
     registry.pushers[i].last_seen = time(NULL);
     memcpy(&registry.pushers[i].last_broadcast, pb, sizeof *pb);
+    registry.pushers[i].id = (pb->mac[3] << 16) | (pb->mac[4] << 8) | pb->mac[5];
+
+    printf("Found new pusher %x\n", registry.pushers[i].id);
 
     registry.num_pushers++;
     registry_cond_broadcast();

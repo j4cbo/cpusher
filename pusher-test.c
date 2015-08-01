@@ -29,11 +29,11 @@ static void fill_pusher_address(struct sockaddr_in * dest, int i) {
                  | registry.pushers[i].last_broadcast.ip[0];
 }
 
-static void send_pattern_to_pusher(int pusher, int pattern, float idx, int *pixel_ptr /*inout*/) {
+static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
     const struct pusher_broadcast *pb = &registry.pushers[pusher].last_broadcast;
     char buffer[1536];
     int strip = 0;
-    int pixel = *pixel_ptr;
+    int pixel = 0;
     int computed_spp = ((sizeof buffer) - 4) / (pb->pixels_per_strip * 3 + 1);
     int max_strips_per_packet = pb->max_strips_per_packet;
     struct sockaddr_in dest;
@@ -54,7 +54,7 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx, int *pixe
             int buffer_offset = 4 + (pb->pixels_per_strip * 3 + 1) * strip_in_packet;
             buffer[buffer_offset] = strip;
             for (i = 0; i < pb->pixels_per_strip; i++) {
-                rgb_t rgb = pattern_arr[pattern].func(pixel++, idx);
+                rgb_t rgb = pattern_arr[pattern].func(registry.pushers[i].id, pixel++, idx);
                 buffer[buffer_offset + 1 + 3*i] = rgb.r;
                 buffer[buffer_offset + 2 + 3*i] = rgb.g;
                 buffer[buffer_offset + 3 + 3*i] = rgb.b;
@@ -69,14 +69,11 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx, int *pixe
             perror("sendto");
         }
     }
-
-    *pixel_ptr = pixel;
 }
 
 int main() {
     float idx = 0;
     int pusher;
-    int pixel;
 
     pusher_send_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (pusher_send_fd < 0) {
@@ -88,10 +85,8 @@ int main() {
     registry_lock();
 
     while (1) {
-        pixel = 0;
-
         for (pusher = 0; pusher < registry.num_pushers; pusher++) {
-            send_pattern_to_pusher(pusher, 1 /*pattern*/, idx, &pixel);
+            send_pattern_to_pusher(pusher, 1 /*pattern*/, idx);
         }
 
         /* we run at 60 Hz, so there are 3600 frames per minute

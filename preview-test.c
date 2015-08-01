@@ -71,7 +71,7 @@ int main() {
         glEnd();
 
         for (i = 0; i < 39; i++) {
-            rgb_t pt = pattern_arr[1].func(i, z);
+            rgb_t pt = pattern_arr[1].func(0, i, z);
             draw_circle(i * .05 - .95, 0, pt);
         }
 
