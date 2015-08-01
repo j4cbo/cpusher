@@ -2,6 +2,7 @@
 #define CPUSHER_REGISTRY_H
 
 #include "wire.h"
+#include <sys/types.h>
 
 /*
  * Pixelpusher Registry
