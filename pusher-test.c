@@ -75,7 +75,9 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx, int *pixe
 
 int main() {
     float idx = 0;
+    int pusher;
     int pixel;
+
     pusher_send_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (pusher_send_fd < 0) {
         perror("socket");
@@ -84,18 +86,21 @@ int main() {
 
     registry_init();
     registry_lock();
-    while (!registry.num_pushers) registry_wait();
 
-    printf("Found pusher " MAC_FMT "\n", MAC_FMT_ARGS(registry.pushers[0].last_broadcast.mac));
     while (1) {
         pixel = 0;
-        send_pattern_to_pusher(0 /*pusher*/, 1 /*pattern*/, idx, &pixel);
+
+        for (pusher = 0; pusher < registry.num_pushers; pusher++) {
+            send_pattern_to_pusher(pusher, 1 /*pattern*/, idx, &pixel);
+        }
 
         /* we run at 60 Hz, so there are 3600 frames per minute
          * beat clock is 138 bpm, so there are 3600 / 138 frames per beat
          */
         idx += (138 / 3600.0);
 
+        registry_unlock();
         usleep(16667);
+        registry_lock();
     }
 }
