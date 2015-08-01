@@ -62,6 +62,14 @@ int main() {
         SDL_Event event;
         while (SDL_PollEvent(&event)) { }
 
+        glColor3ub(0, 0, 0);
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex2f(-2, -2);
+        glVertex2f(-2, 2);
+        glVertex2f(2, 2);
+        glVertex2f(2, -2);
+        glEnd();
+
         for (i = 0; i < 39; i++) {
             rgb_t pt = pattern_arr[1].func(i, z);
             draw_circle(i * .05 - .95, 0, pt);
