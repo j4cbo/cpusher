@@ -1,9 +1,12 @@
 SRCS=pattern.c registry.c sample_patterns.c
-HDRS=wire.h pattern.h
+HDRS=wire.h pattern.h layout.h
 
 .PHONY: all
 
 all: preview-test pusher-test
+
+layout.h: layout.py
+	python layout.py > layout.h
 
 preview-test: $(SRCS) $(HDRS) preview-test.c
 	cc -std=c89 -ansi -pedantic -Wall -Wextra $(SRCS) preview-test.c -o $@ -F/Library/Frameworks -framework SDL2 -framework Cocoa -framework OpenGL
