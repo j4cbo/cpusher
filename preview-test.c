@@ -1,12 +1,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include "pattern.h"
-#include "layout.h"
 
 const int width = 800;
 SDL_Window * win;
 
-#define CIRCLE_RADIUS .012
+#define CIRCLE_RADIUS .005
 #define CIRCLE_POINTS 24
 
 void draw_circle(double x, double y, rgb_t color) {
@@ -57,7 +56,7 @@ int main() {
 
     while (!SDL_QuitRequested()) {
         int t2;
-        size_t i;
+        size_t i, j;
 
         /* Handle SDL events */
         SDL_Event event;
@@ -71,9 +70,12 @@ int main() {
         glVertex2f(2, -2);
         glEnd();
 
-        for (i = 0; i < sizeof(tree_centers)/sizeof(tree_centers[0]); i++) {
-            rgb_t pt = pattern_arr[1].func(0, i, z);
-            draw_circle(tree_centers[i].x, tree_centers[i].y, pt);
+        for (i = 0; i < pusher_config_count; i++) {
+            for (j = 0; j < pushers[i].valid_pixels; j++) {
+                draw_circle(pushers[i].pixel_locations[j].x,
+                            pushers[i].pixel_locations[j].y,
+                            pattern_arr[1].func(pushers[i].pusher_id, j, z));
+            }
         }
 
         SDL_GL_SwapWindow(win);

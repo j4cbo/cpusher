@@ -2,6 +2,7 @@
 #define CPUSHER_PATTERN_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include <math.h>
 
 typedef struct rgb {
@@ -33,5 +34,20 @@ void register_pattern(const char *name, rgb_t(*pattern)(PATTERN_PARAMETERS));
 #ifndef M_PI
 #define M_PI           3.14159265358979323846
 #endif
+
+struct xy {
+    double x;
+    double y;
+};
+
+struct pusher_config {
+    uint32_t pusher_id;
+    size_t valid_pixels;
+    struct xy pixel_locations[1920];
+};
+
+extern const struct pusher_config pushers[];
+extern const size_t pusher_config_count;
+const struct pusher_config * pusher_config_for(uint32_t pusher_id);
 
 #endif /* CPUSHER_PATTERN_H */

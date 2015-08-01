@@ -49,7 +49,20 @@ rgb_t hsv(double h, double s, double v) {
     return out;
 }
 
-#define BRIGHTNESS 255
+const rgb_t black = { 0, 0, 0 };
+
+PATTERN(spinning_rainbow) {
+    const struct pusher_config *cfg = pusher_config_for(pusher_id);
+    double pos, theta;
+    if (!cfg) {
+        return black;
+    }
+    pos = cfg->pixel_locations[pixel_number].x * cos(beat_counter / 4)
+        + cfg->pixel_locations[pixel_number].y * sin(beat_counter / 4);
+    theta = (pos * 3) + beat_counter;
+    return hsv(theta / (2*M_PI), 1, 1);
+}
+
 PATTERN(simple_rainbow) {
     float theta = -(pixel_number * .2) + beat_counter;
     return hsv(theta / (2*M_PI), 1, 1);
