@@ -25,4 +25,9 @@ void register_pattern(const char *name, rgb_t(*pattern)(int, double));
     __attribute__((constructor)) void pat_reg__##x() { register_pattern(#x, pat__##x); } \
     rgb_t pat__##x(int pixel_number, double beat_counter)
 
+/* M_PI is super useful. */
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
 #endif /* CPUSHER_PATTERN_H */
