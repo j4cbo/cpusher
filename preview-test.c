@@ -63,7 +63,7 @@ int main() {
         /* Handle SDL events */
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYDOWN) {
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == ' ') {
                 pattern_num = (pattern_num + 1) % pattern_count;
             }
         }
