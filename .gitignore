@@ -2,3 +2,4 @@ test
 pusher-test
 preview-test
 layout.c
+*.dSYM
