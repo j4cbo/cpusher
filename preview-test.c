@@ -7,6 +7,7 @@ SDL_Window * win;
 
 #define CIRCLE_RADIUS .005
 #define CIRCLE_POINTS 24
+#define FPS 50
 
 void draw_circle(double x, double y, rgb_t color) {
     int i;
@@ -81,8 +82,8 @@ int main() {
         SDL_GL_SwapWindow(win);
 
         t2 = SDL_GetTicks();
-        if (t2 < t+20) {
-            t += 20;
+        if (t2 < t + (1000/FPS)) {
+            t += (1000/FPS);
             SDL_Delay(t - t2);
         } else {
             SDL_Delay(1);
