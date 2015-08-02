@@ -27,6 +27,7 @@ void draw_circle(double x, double y, rgb_t color) {
 int main() {
     int t;
     double z;
+    int pattern_num = 0;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         exit(1);
@@ -61,7 +62,11 @@ int main() {
 
         /* Handle SDL events */
         SDL_Event event;
-        while (SDL_PollEvent(&event)) { }
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_KEYDOWN) {
+                pattern_num = (pattern_num + 1) % pattern_count;
+            }
+        }
 
         glColor3ub(0, 0, 0);
         glBegin(GL_TRIANGLE_FAN);
@@ -75,7 +80,7 @@ int main() {
             for (j = 0; j < pushers[i].valid_pixels; j++) {
                 draw_circle(pushers[i].pixel_locations[j].x,
                             pushers[i].pixel_locations[j].y,
-                            pattern_arr[1].func(pushers[i].pusher_id, j, z));
+                            pattern_arr[pattern_num].func(pushers[i].pusher_id, j, z));
             }
         }
 
