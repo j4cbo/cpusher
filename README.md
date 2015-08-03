@@ -13,10 +13,10 @@ http://railsapps.github.io/xcode-command-line-tools.html
   - Get the (SDL2-2.0.3.dmg) link
 
 * Check out the source:
-	`git clone https://github.com/j4cbo/cpusher.git
-	cd cpusher
-	make
-	./preview-test`
+  - `git clone https://github.com/j4cbo/cpusher.git`
+  - `cd cpusher`
+  - `make`
+  - `./preview-test`
 
 
 
