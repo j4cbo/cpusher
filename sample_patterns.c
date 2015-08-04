@@ -1,4 +1,5 @@
 #include "pattern.h"
+#include "color_util.h"
 
 #include <stdlib.h>
 
@@ -16,50 +17,6 @@ PATTERN(blink) {
     return out;
 }
 */
-
-rgb_t hsv(double h, double s, double v) {
-    rgb_t out = { 0, 0, 0 };
-    double r, g, b, f, p, q, t;
-    int i;
-
-    /* If case we got a wacky value of h, wrap it. */
-    if (h < 0 || h > 1) {
-        h = fmod(h, 1.0);
-        if (h < 0) {
-            h += 1;
-        }
-    }
-
-    i = h * 6;
-    f = h * 6 - i;
-    p = v * (1 - s);
-    q = v * (1 - f * s);
-    t = v * (1 - (1 - f) * s);
-
-    switch (i % 6) {
-        case 0: r = v; g = t; b = p; break;
-        case 1: r = q; g = v; b = p; break;
-        case 2: r = p; g = v; b = t; break;
-        case 3: r = p; g = q; b = v; break;
-        case 4: r = t; g = p; b = v; break;
-        case 5: r = v; g = p; b = q; break;
-    }
-
-    out.r = r * 255;
-    out.g = g * 255;
-    out.b = b * 255;
-    return out;
-}
-
-rgb_t mix(rgb_t c1, rgb_t c2, double frac) {
-    rgb_t out;
-    if (frac < 0) frac = 0;
-    if (frac > 1) frac = 1;
-    out.r = (c1.r * (1-frac)) + (c2.r * frac);
-    out.g = (c1.g * (1-frac)) + (c2.g * frac);
-    out.b = (c1.b * (1-frac)) + (c2.b * frac);
-    return out;
-}
 
 /*
  * Mechanism for generating a 'random' color. This uses a multiply-with-carry RNG from

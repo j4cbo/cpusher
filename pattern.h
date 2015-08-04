@@ -5,11 +5,17 @@
 #include <stddef.h>
 #include <math.h>
 
-typedef struct rgb {
+/*
+ * rgb_t
+ *
+ * This struct represents the color sent to a single pixel. See color_util.h for some
+ * helper functions to create and manipulate colors.
+ */
+typedef struct {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} __attribute__((packed)) rgb_t;
+} rgb_t;
 
 #define PATTERN_PARAMETERS __attribute__((unused)) uint32_t pusher_id, \
                            int pixel_number, \

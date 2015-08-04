@@ -1,19 +1,36 @@
+from __future__ import division
 from math import sin, cos, pi
 import itertools
 
+# Generate the pattern for a 6-arm (3-pixel-per-arm) tree.
 def cluster6(x, y):
-    led_distance = .015
-    for rot in range(6):
-        for dist in (0, 2, 3, 1):
-            yield(x + cos(rot * pi * 2 / 6) * led_distance * (dist + 1.5),
-                  y + sin(rot * pi * 2 / 6) * led_distance * (dist + 1.5))
+    pixel_spacing = .015
+    inner_pixel_radius = 1.5 * pixel_spacing
+    num_arms = 6
+    # for each arm...
+    for arm in range(num_arms):
+        theta = (arm / num_arms) * (2 * pi)
+        # for each pixel in the arm...
+        # this is out of order to reflect how we wire the pixels out of order (so the
+        # cables will reach): first innermost, then second-outermost, then outermost,
+        # then second-innermost, then on to the next arm.
+        for pixel_index in (0, 2, 3, 1):
+            distance_from_center = inner_pixel_radius + (pixel_index * pixel_spacing)
+            yield(x + cos(theta) * distance_from_center, y + sin(theta) * distance_from_center)
 
 def cluster8(x, y):
-    led_distance = .02
-    for rot in range(8):
-        for dist in (0, 2, 1):
-            yield(x + cos(rot * pi * 2 / 8) * led_distance * (dist + 1.5),
-                  y + sin(rot * pi * 2 / 8) * led_distance * (dist + 1.5))
+    pixel_spacing = .02
+    inner_pixel_radius = 1.5 * pixel_spacing
+    num_arms = 8
+    # for each arm...
+    for arm in range(num_arms):
+        theta = (arm / num_arms) * (2 * pi)
+        # for each pixel in the arm...
+        # again, this is out of order to reflect the pixel wiring order: 0 (inner),
+        # then 2 (outer), then 1 (middle), then on to the next arm
+        for pixel_index in (0, 2, 1):
+            distance_from_center = inner_pixel_radius + (pixel_index * pixel_spacing)
+            yield(x + cos(theta) * distance_from_center, y + sin(theta) * distance_from_center)
 
 def densecluster8(x, y):
     led_distance = .003
