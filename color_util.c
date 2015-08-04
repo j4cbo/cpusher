@@ -64,3 +64,44 @@ rgb_t mix(rgb_t color1, rgb_t color2, double frac) {
     out.b = (color1.b * (1-frac)) + (color2.b * frac);
     return out;
 }
+
+/*
+ * Mechanism for generating a 'random' color. This uses a multiply-with-carry RNG from
+ * https://en.wikipedia.org/wiki/Random_number_generation - it's better than rand()/srand()
+ * for our purposes.
+ */
+static int32_t random_w, random_z;
+
+/*
+ * Initialize the random number generator
+ */
+void random_seed(uint32_t seed_value) {
+    random_w = 12345;
+    random_z = 6789 + seed_value;
+}
+
+/*
+ * Generate a random 32-bit integer
+ */
+uint32_t random_uint() {
+    random_z = 36969 * (random_z & 65535) + (random_z >> 16);
+    random_w = 18000 * (random_w & 65535) + (random_w >> 16);
+    return (random_z << 16) + random_w;
+}
+
+/*
+ * Generate a random double between 0 and 1
+ */
+double random_normal_double() {
+    return (double)random_uint() / UINT32_MAX;
+}
+
+/*
+ * Generate a random color at full brightness and at least 50% saturation
+ */
+rgb_t random_bright_color() {
+    return hsv(random_normal_double(), // random color
+               0.5 + (random_normal_double() / 2), // random saturation, 50% to 100%
+               1 // full brightness
+              );
+}

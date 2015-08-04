@@ -17,6 +17,13 @@ typedef struct {
     uint8_t b;
 } rgb_t;
 
+/*
+ * This defines the parameters that each pattern receives. Stay with me, it's not that bad :)
+ *
+ * Each pattern is a function that is called once per pixel per frame, to calculate the color
+ * that each pixel should have. It receives these inputs:
+ *   (TODO)
+ */
 #define PATTERN_PARAMETERS __attribute__((unused)) uint32_t pusher_id, \
                            int pixel_number, \
                            double beat_counter

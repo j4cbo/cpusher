@@ -2,7 +2,7 @@ from __future__ import division
 from math import sin, cos, pi
 import itertools
 
-# Generate the pattern for a 6-arm (3-pixel-per-arm) tree.
+# Generate the pattern for a 6-arm (4-pixel-per-arm) tree.
 def cluster6(x, y):
     pixel_spacing = .015
     inner_pixel_radius = 1.5 * pixel_spacing
@@ -16,8 +16,9 @@ def cluster6(x, y):
         # then second-innermost, then on to the next arm.
         for pixel_index in (0, 2, 3, 1):
             distance_from_center = inner_pixel_radius + (pixel_index * pixel_spacing)
-            yield(x + cos(theta) * distance_from_center, y + sin(theta) * distance_from_center)
+            yield (x + cos(theta) * distance_from_center, y + sin(theta) * distance_from_center)
 
+# Generate the pattern for an 8-arm (3-pixel-per-arm) tree.
 def cluster8(x, y):
     pixel_spacing = .02
     inner_pixel_radius = 1.5 * pixel_spacing
@@ -30,7 +31,7 @@ def cluster8(x, y):
         # then 2 (outer), then 1 (middle), then on to the next arm
         for pixel_index in (0, 2, 1):
             distance_from_center = inner_pixel_radius + (pixel_index * pixel_spacing)
-            yield(x + cos(theta) * distance_from_center, y + sin(theta) * distance_from_center)
+            yield (x + cos(theta) * distance_from_center, y + sin(theta) * distance_from_center)
 
 def densecluster8(x, y):
     led_distance = .003

@@ -18,30 +18,6 @@ PATTERN(blink) {
 }
 */
 
-/*
- * Mechanism for generating a 'random' color. This uses a multiply-with-carry RNG from
- * https://en.wikipedia.org/wiki/Random_number_generation - more random than rand()/srand().
- */
-static int32_t random_w, random_z;
-static uint32_t random_uint() {
-    random_z = 36969 * (random_z & 65535) + (random_z >> 16);
-    random_w = 18000 * (random_w & 65535) + (random_w >> 16);
-    return (random_z << 16) + random_w;
-}
-static void random_seed(uint32_t seed_value) {
-    random_w = 12345;
-    random_z = 6789 + seed_value;
-}
-
-/*
- * Retunrs a random color at full brightness and at least 50% saturation.
- */
-rgb_t random_color() {
-    return hsv((double)random_uint() / UINT32_MAX,
-               0.5 + ((double)random_uint() / UINT32_MAX / 2),
-               1);
-}
-
 const rgb_t black = { 0, 0, 0 };
 
 PATTERN(wipe) {
@@ -60,9 +36,9 @@ PATTERN(wipe) {
     /* Pick some "random" colors from the current and next beat number. */
     rgb_t wipe_prev_color, wipe_next_color;
     random_seed(beat_number);
-    wipe_prev_color = random_color();
+    wipe_prev_color = random_bright_color();
     random_seed(beat_number + 1);
-    wipe_next_color = random_color();
+    wipe_next_color = random_bright_color();
 
     cfg = pusher_config_for(pusher_id);
     if (!cfg) {
