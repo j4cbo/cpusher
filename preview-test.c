@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include "pattern.h"
+#include "clock.h"
 
 const int width = 800;
 SDL_Window * win;
@@ -26,8 +27,9 @@ void draw_circle(double x, double y, rgb_t color) {
 
 int main() {
     int t;
-    double z;
     int pattern_num = 0;
+
+    beat_clock_init();
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         exit(1);
@@ -54,11 +56,10 @@ int main() {
 
     t = SDL_GetTicks();
 
-    z = 0;
-
     while (!SDL_QuitRequested()) {
         int t2;
         size_t i, j;
+        double z = beat_clock();
 
         /* Handle SDL events */
         SDL_Event event;
@@ -94,12 +95,7 @@ int main() {
             SDL_Delay(1);
             t = t2;
         }
-
-        z += .04;
     }
 
     return 0;
 }
-
-
-
