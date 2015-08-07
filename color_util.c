@@ -76,7 +76,7 @@ static int32_t random_w, random_z;
  * Initialize the random number generator
  */
 void random_seed(uint32_t seed_value) {
-    random_w = 12345;
+    random_w = 12345 + seed_value;
     random_z = 6789 + seed_value;
 }
 
@@ -100,8 +100,18 @@ double random_normal_double() {
  * Generate a random color at full brightness and at least 50% saturation
  */
 rgb_t random_bright_color() {
-    return hsv(random_normal_double(), // random color
-               0.5 + (random_normal_double() / 2), // random saturation, 50% to 100%
-               1 // full brightness
-              );
+    uint32_t u = random_uint();
+    rgb_t out = { 0, 0, 0 };
+    #define X1 (u & 0xff)
+    #define X2 ((u >> 8) & 0xff)
+
+    switch ((u >> 24) % 6) {
+    case 0: out.r = 255; out.g = X1; out.b = X2; break;
+    case 1: out.r = 255; out.g = X2; out.b = X1; break;
+    case 2: out.r = X1; out.g = 255; out.b = X2; break;
+    case 3: out.r = X2; out.g = 255; out.b = X1; break;
+    case 4: out.r = X1; out.g = X2; out.b = 255; break;
+    case 5: out.r = X2; out.g = X1; out.b = 255; break;
+    }
+    return out;
 }
