@@ -81,7 +81,7 @@ config = {
         cluster8(0.70, -0.60),
         cluster8(0.45, -0.30),
     ],
-    0x2c2134: [
+    0x98beca: [
         densecluster8(0.05, 0.05),
         densecluster8(-0.25, -0.05),
     ],
