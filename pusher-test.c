@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <math.h>
+#include <sys/time.h>
 #include <time.h>
+#include "clock.h"
 
 int pusher_send_fd;
 
@@ -71,8 +73,9 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
     }
 }
 
+#define FPS 60
+
 int main() {
-    float idx = 0;
     int pusher;
 
     pusher_send_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -81,21 +84,54 @@ int main() {
         exit(1);
     }
 
+    beat_clock_init();
+
+    struct timeval last_frame;
+    struct timeval frame_interval = { 0, 1000000 / FPS };
+    gettimeofday(&last_frame, NULL);
+
+    uint64_t sleep_total_time = 0;
+    int sleep_count = 0;
+    int frame_counter = 0;
+
     registry_init();
     registry_lock();
 
     while (1) {
+        double idx = beat_clock();
         for (pusher = 0; pusher < registry.num_pushers; pusher++) {
             send_pattern_to_pusher(pusher, 1 /*pattern*/, idx);
         }
 
-        /* we run at 60 Hz, so there are 3600 frames per minute
-         * beat clock is 138 bpm, so there are 3600 / 138 frames per beat
-         */
-        idx += (138 / 3600.0);
-
         registry_unlock();
-        usleep(16667);
+
+        struct timeval now, next_frame, diff;
+        gettimeofday(&now, NULL);
+        timeradd(&last_frame, &frame_interval, &next_frame);
+        if (timercmp(&now, &next_frame, <)) {
+            timersub(&next_frame, &now, &diff);
+            uint64_t usec = (uint64_t)diff.tv_sec * 1000000 + (uint64_t)diff.tv_usec;
+            usleep(usec);
+            sleep_total_time += usec;
+            sleep_count++;
+        } else {
+            timersub(&now, &next_frame, &diff);
+            uint64_t usec = (uint64_t)diff.tv_sec * 1000000 + (uint64_t)diff.tv_usec;
+            printf("dropped frame - %lld us\n", (long long)usec);
+            memcpy(&next_frame, &now, sizeof now);
+        }
+
+        memcpy(&last_frame, &next_frame, sizeof next_frame);
+
+        if (++frame_counter == FPS) {
+            frame_counter = 0;
+            if (sleep_count) {
+                printf("avg sleep: %d\n", (int)(sleep_total_time / sleep_count));
+            }
+            sleep_count = 0;
+            sleep_total_time = 0;
+        }
+
         registry_lock();
     }
 }
