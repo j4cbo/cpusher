@@ -9,7 +9,7 @@ layout.c: layout.py
 	python layout.py > layout.c
 
 preview-test: $(SRCS) $(HDRS) preview-test.c clock_sim.c
-	cc -g -Wall -Wextra $(SRCS) preview-test.c clock_sim.c -o $@ -F/Library/Frameworks -framework SDL2 -framework Cocoa -framework OpenGL
+	cc -g -O2 -Wall -Wextra $(SRCS) preview-test.c clock_sim.c -o $@ -F/Library/Frameworks -framework SDL2 -framework Cocoa -framework OpenGL
 
 pusher-test: $(SRCS) $(HDRS) pusher-test.c
-	cc -g -Wall -Wextra -D_BSD_SOURCE $(SRCS) pusher-test.c -lpthread -lm -o $@
+	cc -g -O2 -Wall -Wextra -D_BSD_SOURCE $(SRCS) pusher-test.c -lpthread -lm -o $@
