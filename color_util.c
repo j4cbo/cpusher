@@ -9,7 +9,7 @@
  */
 rgb_t hsv(double hue, double saturation, double value) {
     rgb_t out = { 0, 0, 0 };
-    double r, g, b;
+    double r = 0, g = 0, b = 0;
 
     /* If case we got a wacky value of h, wrap it. */
     if (hue < 0 || hue > 1) {

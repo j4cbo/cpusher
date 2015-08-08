@@ -11,5 +11,5 @@ layout.c: layout.py
 preview-test: $(SRCS) $(HDRS) preview-test.c clock_sim.c
 	cc -g -O2 -Wall -Wextra $(SRCS) preview-test.c clock_sim.c -o $@ -F/Library/Frameworks -framework SDL2 -framework Cocoa -framework OpenGL
 
-pusher-test: $(SRCS) $(HDRS) pusher-test.c clock_sim.c
-	cc -g -O2 -Wall -Wextra -D_BSD_SOURCE $(SRCS) pusher-test.c clock_sim.c -lpthread -lm -o $@
+pusher-test: $(SRCS) $(HDRS) pusher-test.c clock_midi.c
+	cc -g -O2 -Wall -Wextra -D_BSD_SOURCE $(SRCS) pusher-test.c clock_midi.c -lpthread -lm -lasound -o $@ -flto

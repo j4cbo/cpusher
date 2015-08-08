@@ -1,6 +1,7 @@
 #include <alsa/asoundlib.h>
 #include <inttypes.h>
 #include <math.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -16,29 +17,40 @@
 static int64_t current_time() {
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
-    return t.tv_sec * 1000000000 + t.tv_nsec;
+    return (int64_t)t.tv_sec * 1000000000 + (int64_t)t.tv_nsec;
 }
-
-
-static int64_t last_beat_time = 0;
-
-static double fastclk_nanoseconds_per_beat = NANOSECONDS_FROM_BPM(120);
-static double fastclk_at_last_beat = 0;
 
 /*
  * Fastclk rises by 1 per beat.
  *
  * TODO: represent this in a way not subject to fp drift
  */
-static double fastclk_at_last_beat;
+static pthread_mutex_t fastclk_mutex;
+static int64_t last_beat_time = 0;
+static double fastclk_nanoseconds_per_beat = NANOSECONDS_FROM_BPM(120);
+static double fastclk_at_last_beat = 0;
+
+double beat_clock() {
+    pthread_mutex_lock(&fastclk_mutex);
+    int64_t now = current_time();
+    double time_since_last_beat = now - last_beat_time;
+    double fastclk_growth = time_since_last_beat / fastclk_nanoseconds_per_beat;
+    double ret = (fastclk_at_last_beat + fastclk_growth) / 24;
+    pthread_mutex_unlock(&fastclk_mutex);
+    return ret;
+}
+
 
 static void handle_beat() {
     int64_t now = current_time();
     double time_since_last_beat = now - last_beat_time;
 
+    pthread_mutex_lock(&fastclk_mutex);
+
     if (time_since_last_beat < MIN_TICK_NS || time_since_last_beat > MAX_TICK_NS) {
         // Just ignore totally out-of-range ticks
         last_beat_time = now;
+        pthread_mutex_unlock(&fastclk_mutex);
         return;
     }
 
@@ -62,6 +74,7 @@ static void handle_beat() {
 
     fastclk_at_last_beat = new_fastclk;
     last_beat_time = now;
+    pthread_mutex_unlock(&fastclk_mutex);
 }
 
 static void handle_byte(char b) {
@@ -159,9 +172,31 @@ static void open_once() {
     }
 }
 
-static void midi_main_loop() {
+static void *beat_clock_main_loop(void *arg) {
+    (void)arg;
     while (1) {
         open_once();
         sleep(1);
     }
+    return NULL;
+}
+
+#define PTHR_CHK(x) do { errno = x; if (errno) { perror(#x); exit(1); } } while(0)
+
+static void beat_clock_start_thread() {
+    pthread_t thr;
+    pthread_attr_t attr;
+
+    PTHR_CHK(pthread_attr_init(&attr));
+    PTHR_CHK(pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED));
+    PTHR_CHK(pthread_create(&thr, &attr, beat_clock_main_loop, NULL));
+    PTHR_CHK(pthread_attr_destroy(&attr));
+}
+
+static pthread_once_t beat_clock_init_once = PTHREAD_ONCE_INIT;
+
+void beat_clock_init() {
+    PTHR_CHK(pthread_mutex_init(&fastclk_mutex, NULL));
+    last_beat_time = current_time();
+    pthread_once(&beat_clock_init_once, beat_clock_start_thread);
 }

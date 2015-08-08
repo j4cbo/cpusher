@@ -56,7 +56,7 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
             int buffer_offset = 4 + (pb->pixels_per_strip * 3 + 1) * strip_in_packet;
             buffer[buffer_offset] = strip;
             for (i = 0; i < pb->pixels_per_strip; i++) {
-                rgb_t rgb = pattern_arr[pattern].func(registry.pushers[i].id, pixel++, idx);
+                rgb_t rgb = pattern_arr[pattern].func(registry.pushers[pusher].id, pixel++, idx);
                 buffer[buffer_offset + 1 + 3*i] = rgb.r;
                 buffer[buffer_offset + 2 + 3*i] = rgb.g;
                 buffer[buffer_offset + 3 + 3*i] = rgb.b;
