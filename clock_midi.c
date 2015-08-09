@@ -61,29 +61,52 @@ static void handle_beat() {
 
     printf("fastclk %f -> now %f\t", fastclk_growth, new_fastclk);
 
-    fastclk_nanoseconds_per_beat = (fastclk_nanoseconds_per_beat * .9)
-                                 + (time_since_last_beat * .1);
+    fastclk_nanoseconds_per_beat = (fastclk_nanoseconds_per_beat * .5)
+                                 + (time_since_last_beat * .5);
 
     double phase = fmod(new_fastclk, 1.0);
     if (phase > 0.5) {
         phase = phase - 1;
     }
 
-    printf("phase off %f\n", phase);
-    fastclk_nanoseconds_per_beat += (50000 * phase);
+    printf("phase off %+f  ", phase);
+
+    double aphase = fabs(phase);
+    if (aphase > 0.2) printf("XXXXXXXX\n");
+    else if (aphase > 0.1) printf("------\n");
+    else if (aphase > 0.05) printf("----\n");
+    else if (aphase > 0.01) printf("--\n");
+    else if (aphase > .005) printf("-\n");
+    else printf(".\n");
+    fastclk_nanoseconds_per_beat += (2500000 * phase);
 
     fastclk_at_last_beat = new_fastclk;
     last_beat_time = now;
     pthread_mutex_unlock(&fastclk_mutex);
 }
 
+static void handle_button() {
+    printf("PHASE RESET\n");
+    pthread_mutex_lock(&fastclk_mutex);
+    fastclk_at_last_beat = fmod(fastclk_at_last_beat, 1.0);
+    pthread_mutex_unlock(&fastclk_mutex);
+}
+
+static char seen_button = 0;
+
 static void handle_byte(char b) {
     /* For now, only handle F8 (beat clock) bytes.
-     *
-     * TODO: state machine for other stuff
      */
     if (b == 0xf8) {
         handle_beat();
+    } else if (b == 0xb0 && seen_button == 0) {
+        seen_button = 1;
+    } else if (b == 0x4e && seen_button == 1) {
+        seen_button = 2;
+    } else if (b == 0x7f && seen_button == 2) {
+        handle_button();
+    } else {
+        seen_button = 0;
     }
 }
 
