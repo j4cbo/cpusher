@@ -4,13 +4,18 @@
 #include "pattern.h"
 
 /*
- * hsv
+ * hsv_i
  *
  * This function takes a hue, saturation, and value (https://en.wikipedia.org/wiki/HSL_and_HSV)
  * and mixes them to produce an rgb value. HSV is a more convenient way of manipulating colors
  * than dealing with the red, green, and blue components separately.
+ *
+ * The inputs on this function are as follows:
+ * hue - 0-65535 to go around the color wheel
+ * saturation - 0-255
+ * value - 0.255
  */
-rgb_t hsv(double hue, double saturation, double value);
+rgb_t hsv_i(uint16_t hue, uint8_t saturation, uint8_t value);
 
 /*
  * mix

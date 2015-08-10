@@ -66,10 +66,10 @@ PATTERN(spinning_rainbow) {
     pos = pixel_x * cos(beat_counter / 4)
         + pixel_y * sin(beat_counter / 4);
     theta = (pos * 3) + beat_counter;
-    return hsv(theta / (2*M_PI), 1, 1);
+    return hsv_i(theta / (2*M_PI) * 65536, 255, 255);
 }
 
 PATTERN(simple_rainbow) {
     float theta = -(pixel_number * .2) + beat_counter;
-    return hsv(theta / (2*M_PI), 1, 1);
+    return hsv_i(theta / (2*M_PI) * 65536, 255, 255);
 }

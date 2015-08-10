@@ -7,40 +7,59 @@
  * and mixes them to produce an rgb value. HSV is a more convenient way of manipulating colors
  * than dealing with the red, green, and blue components separately.
  */
-rgb_t hsv(double hue, double saturation, double value) {
+rgb_t hsv_i(uint16_t hue, uint8_t saturation, uint8_t value) {
     rgb_t out = { 0, 0, 0 };
-    double r = 0, g = 0, b = 0;
-
-    /* If case we got a wacky value of h, wrap it. */
-    if (hue < 0 || hue > 1) {
-        hue = fmod(hue, 1.0);
-        if (hue < 0) {
-            hue += 1;
-        }
-    }
 
     // which slice of the color wheel are we in?
-    int index = hue * 6;
+    int index = (uint32_t)hue / ((1 << 16) / 6);
 
     // how far into that slice are we?
-    double hue_frac = (hue * 6) - index;
+    uint32_t hue_frac = ((uint32_t)hue * 6) + 3 - (index << 16);
 
-    double p = value * (1 - saturation);
-    double q = value * (1 - hue_frac * saturation);
-    double t = value * (1 - (1 - hue_frac) * saturation);
+    uint8_t p = ((uint32_t)value * (uint32_t)(256 - saturation)) >> 8;
 
-    switch (index % 6) {
-        case 0: r = value; g = t; b = p;        break;
-        case 1: r = q;     g = value; b = p;     break;
-        case 2: r = p;     g = value; b = t; break;
-        case 3: r = p;     g = q;     b = value; break;
-        case 4: r = t;     g = p;     b = value; break;
-        case 5: r = value; g = p;     b = q; break;
+    uint32_t zpi;
+    if (index % 2 == 0) {
+        zpi = (((1 << 16) - hue_frac) * saturation);
+    } else {
+        zpi = (hue_frac * saturation);
     }
 
-    out.r = r * 255;
-    out.g = g * 255;
-    out.b = b * 255;
+    uint32_t zf = (uint32_t)value * ((1 << 24) - zpi);
+    uint8_t z = zf >> 24;
+
+    switch (index % 6) {
+        case 0:
+            out.r = value;
+            out.g = z;
+            out.b = p;
+        break;
+        case 1:
+            out.r = z;
+            out.g = value;
+            out.b = p;
+        break;
+        case 2:
+            out.r = p;
+            out.g = value;
+            out.b = z;
+        break;
+        case 3:
+            out.r = p;
+            out.g = z;
+            out.b = value;
+        break;
+        case 4:
+            out.r = z;
+            out.g = p;
+            out.b = value;
+        break;
+        case 5:
+            out.r = value;
+            out.g = p;
+            out.b = z;
+        break;
+    }
     return out;
 }
 
