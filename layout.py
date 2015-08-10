@@ -34,9 +34,9 @@ def cluster8(x, y):
             yield (x + cos(theta) * distance_from_center, y + sin(theta) * distance_from_center)
 
 def densecluster8(x, y):
-    led_distance = .003
+    led_distance = .001
     for rot in range(8):
-        for dist in range(40):
+        for dist in range(120):
             yield(x + cos(rot * pi * 2 / 8) * led_distance * (dist + 10),
                   y + sin(rot * pi * 2 / 8) * led_distance * (dist + 10))
 

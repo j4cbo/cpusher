@@ -31,11 +31,12 @@ static void fill_pusher_address(struct sockaddr_in * dest, int i) {
                  | registry.pushers[i].last_broadcast.ip[0];
 }
 
-static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
+static int send_pattern_to_pusher(int pusher, int pattern, float idx) {
     const struct pusher_broadcast *pb = &registry.pushers[pusher].last_broadcast;
     char buffer[1536];
     int strip = 0;
     size_t pixel = 0;
+    int pixels_calculated = 0;
     int computed_spp = ((sizeof buffer) - 4) / (pb->pixels_per_strip * 3 + 1);
     int max_strips_per_packet = pb->max_strips_per_packet;
     struct sockaddr_in dest;
@@ -50,7 +51,7 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
 
     const struct pusher_config *cfg = pusher_config_for(registry.pushers[pusher].id);
     if (!cfg) {
-        return;
+        return 0;
     }
 
     while (strip < pb->strips_attached) {
@@ -76,6 +77,7 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
                     buffer[buffer_offset + 2 + 3*i] = rgb.g;
                     buffer[buffer_offset + 3 + 3*i] = rgb.b;
                     pixel++;
+                    pixels_calculated++;
                 }
             }
 
@@ -88,6 +90,8 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
             perror("sendto");
         }
     }
+
+    return pixels_calculated;
 }
 
 #define FPS 60
@@ -116,11 +120,28 @@ int main() {
 
     while (1) {
         double idx = beat_clock();
+        int pixels_pushed = 0;
         for (pusher = 0; pusher < registry.num_pushers; pusher++) {
-            send_pattern_to_pusher(pusher, 1 /*pattern*/, idx);
+            pixels_pushed += send_pattern_to_pusher(pusher, 1 /*pattern*/, idx);
         }
 
         registry_unlock();
+
+        if (++frame_counter == FPS) {
+            frame_counter = 0;
+            if (sleep_count) {
+                printf("%d pixels; avg sleep: %d\n", pixels_pushed, (int)(sleep_total_time / sleep_count));
+            }
+
+            for (pusher = 0; pusher < registry.num_pushers; pusher++) {
+                if (!pusher_config_for(registry.pushers[pusher].id)) {
+                    printf("\n/!\\ UNKNOWN PUSHER: %06x\n\n", registry.pushers[pusher].id);
+                }
+            }
+
+            sleep_count = 0;
+            sleep_total_time = 0;
+        }
 
         struct timeval now, next_frame, diff;
         gettimeofday(&now, NULL);
@@ -139,15 +160,6 @@ int main() {
         }
 
         memcpy(&last_frame, &next_frame, sizeof next_frame);
-
-        if (++frame_counter == FPS) {
-            frame_counter = 0;
-            if (sleep_count) {
-                printf("avg sleep: %d\n", (int)(sleep_total_time / sleep_count));
-            }
-            sleep_count = 0;
-            sleep_total_time = 0;
-        }
 
         registry_lock();
     }
