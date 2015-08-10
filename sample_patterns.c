@@ -21,8 +21,6 @@ PATTERN(blink) {
 const rgb_t black = { 0, 0, 0 };
 
 PATTERN(wipe) {
-    const struct pusher_config *cfg;
-
     /* for how much of each beat does the wipe happen? */
     #define WIPE_PORTION 0.3
 
@@ -40,11 +38,6 @@ PATTERN(wipe) {
     random_seed(beat_number + 1);
     wipe_next_color = random_bright_color();
 
-    cfg = pusher_config_for(pusher_id);
-    if (!cfg) {
-        return black;
-    }
-
     if (phase < WIPE_PORTION) {
         double transition_level = phase / WIPE_PORTION;
 
@@ -52,10 +45,10 @@ PATTERN(wipe) {
          * each beat, too. */
         double pos;
         switch (beat_number % 4) {
-        case 0: pos = (cfg->pixel_locations[pixel_number].x / 2) + 0.5; break;
-        case 1: pos = (cfg->pixel_locations[pixel_number].y / 2) + 0.5; break;
-        case 2: pos = (-cfg->pixel_locations[pixel_number].x / 2) + 0.5; break;
-        case 3: pos = (-cfg->pixel_locations[pixel_number].y / 2) + 0.5; break;
+        case 0: pos = (pixel_x / 2) + 0.5; break;
+        case 1: pos = (pixel_y / 2) + 0.5; break;
+        case 2: pos = (-pixel_x / 2) + 0.5; break;
+        case 3: pos = (-pixel_y / 2) + 0.5; break;
         }
 
         if (pos > transition_level) {
@@ -69,13 +62,9 @@ PATTERN(wipe) {
 }
 
 PATTERN(spinning_rainbow) {
-    const struct pusher_config *cfg = pusher_config_for(pusher_id);
     double pos, theta;
-    if (!cfg) {
-        return black;
-    }
-    pos = cfg->pixel_locations[pixel_number].x * cos(beat_counter / 4)
-        + cfg->pixel_locations[pixel_number].y * sin(beat_counter / 4);
+    pos = pixel_x * cos(beat_counter / 4)
+        + pixel_y * sin(beat_counter / 4);
     theta = (pos * 3) + beat_counter;
     return hsv(theta / (2*M_PI), 1, 1);
 }

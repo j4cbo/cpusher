@@ -6,7 +6,7 @@ struct pattern_info *pattern_arr = NULL;
 int pattern_count = 0;
 static int pattern_max = 0;
 
-void register_pattern(const char *name, rgb_t(*pattern)(uint32_t, int, double)) {
+void register_pattern(const char *name, rgb_t(*pattern)(double, double, int, double)) {
     /* grow the array if need be */
     if (pattern_count == pattern_max) {
         pattern_max *= 2;

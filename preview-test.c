@@ -79,9 +79,9 @@ int main() {
 
         for (i = 0; i < pusher_config_count; i++) {
             for (j = 0; j < pushers[i].valid_pixels; j++) {
-                draw_circle(pushers[i].pixel_locations[j].x,
-                            pushers[i].pixel_locations[j].y,
-                            pattern_arr[pattern_num].func(pushers[i].pusher_id, j, z));
+                double x = pushers[i].pixel_locations[j].x;
+                double y = pushers[i].pixel_locations[j].y;
+                draw_circle(x, y, pattern_arr[pattern_num].func(x, y, j, z));
             }
         }
 

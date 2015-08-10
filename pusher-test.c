@@ -35,7 +35,7 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
     const struct pusher_broadcast *pb = &registry.pushers[pusher].last_broadcast;
     char buffer[1536];
     int strip = 0;
-    int pixel = 0;
+    size_t pixel = 0;
     int computed_spp = ((sizeof buffer) - 4) / (pb->pixels_per_strip * 3 + 1);
     int max_strips_per_packet = pb->max_strips_per_packet;
     struct sockaddr_in dest;
@@ -48,6 +48,11 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
 
     buffer[0] = buffer[1] = buffer[2] = buffer[3] = 0;
 
+    const struct pusher_config *cfg = pusher_config_for(pusher);
+    if (!cfg) {
+        return;
+    }
+
     while (strip < pb->strips_attached) {
         /* Build a packet */
         int strip_in_packet = 0;
@@ -56,10 +61,22 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
             int buffer_offset = 4 + (pb->pixels_per_strip * 3 + 1) * strip_in_packet;
             buffer[buffer_offset] = strip;
             for (i = 0; i < pb->pixels_per_strip; i++) {
-                rgb_t rgb = pattern_arr[pattern].func(registry.pushers[pusher].id, pixel++, idx);
-                buffer[buffer_offset + 1 + 3*i] = rgb.r;
-                buffer[buffer_offset + 2 + 3*i] = rgb.g;
-                buffer[buffer_offset + 3 + 3*i] = rgb.b;
+                if (pixel >= cfg->valid_pixels) {
+                    buffer[buffer_offset + 1 + 3*i] = 0;
+                    buffer[buffer_offset + 2 + 3*i] = 0;
+                    buffer[buffer_offset + 3 + 3*i] = 0;
+                } else {
+                    rgb_t rgb = pattern_arr[pattern].func(
+                        cfg->pixel_locations[pixel].x,
+                        cfg->pixel_locations[pixel].y,
+                        pixel,
+                        idx
+                    );
+                    buffer[buffer_offset + 1 + 3*i] = rgb.r;
+                    buffer[buffer_offset + 2 + 3*i] = rgb.g;
+                    buffer[buffer_offset + 3 + 3*i] = rgb.b;
+                    pixel++;
+                }
             }
 
             strip++;
@@ -100,7 +117,7 @@ int main() {
     while (1) {
         double idx = beat_clock();
         for (pusher = 0; pusher < registry.num_pushers; pusher++) {
-            send_pattern_to_pusher(pusher, 1 /*pattern*/, idx);
+            send_pattern_to_pusher(pusher, 3 /*pattern*/, idx);
         }
 
         registry_unlock();

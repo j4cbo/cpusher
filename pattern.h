@@ -22,10 +22,18 @@ typedef struct {
  *
  * Each pattern is a function that is called once per pixel per frame, to calculate the color
  * that each pixel should have. It receives these inputs:
- *   (TODO)
+ *   pixel_x      - the X axis of the location of this pixel
+ *   pixel_y      - the Y axis of the location of this pixel
+ *   pixel_number - the sequential position of this pixel on its PixelPusher
+ *   beat_counter - a double that starts at 0 and counts up continuously, 1 per beat
+ *
+ * The __attribute__((unused)) flags make the compiler not warn if a pattern doesn't use
+ * that variable. (A pattern will likely use either x and y, or pixel_number, but not
+ * necessarily both)
  */
-#define PATTERN_PARAMETERS __attribute__((unused)) uint32_t pusher_id, \
-                           int pixel_number, \
+#define PATTERN_PARAMETERS __attribute__((unused)) double pixel_x, \
+                           __attribute__((unused)) double pixel_y, \
+                           __attribute__((unused)) int pixel_number, \
                            double beat_counter
 
 struct pattern_info {
