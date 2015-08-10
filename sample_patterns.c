@@ -61,6 +61,13 @@ PATTERN(wipe) {
     }
 }
 
+PATTERN(spiral) {
+    double pos, theta;
+    pos = atan2(pixel_x, pixel_y)*5 + sqrt(pixel_x*pixel_x + pixel_y*pixel_y)*10;
+    theta = pos + beat_counter;
+    return hsv_i(theta / (2*M_PI) * 65536, 255, 255);
+}
+
 PATTERN(spinning_rainbow) {
     double pos, theta;
     pos = pixel_x * cos(beat_counter / 4)
