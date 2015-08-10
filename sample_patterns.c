@@ -70,6 +70,6 @@ PATTERN(spinning_rainbow) {
 }
 
 PATTERN(simple_rainbow) {
-    float theta = -(pixel_number * .2) + beat_counter;
+    double theta = -(pixel_number * .2) + beat_counter;
     return hsv_i(theta / (2*M_PI) * 65536, 255, 255);
 }
