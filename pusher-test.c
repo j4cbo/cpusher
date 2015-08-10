@@ -48,7 +48,7 @@ static void send_pattern_to_pusher(int pusher, int pattern, float idx) {
 
     buffer[0] = buffer[1] = buffer[2] = buffer[3] = 0;
 
-    const struct pusher_config *cfg = pusher_config_for(pusher);
+    const struct pusher_config *cfg = pusher_config_for(registry.pushers[pusher].id);
     if (!cfg) {
         return;
     }
@@ -117,7 +117,7 @@ int main() {
     while (1) {
         double idx = beat_clock();
         for (pusher = 0; pusher < registry.num_pushers; pusher++) {
-            send_pattern_to_pusher(pusher, 3 /*pattern*/, idx);
+            send_pattern_to_pusher(pusher, 1 /*pattern*/, idx);
         }
 
         registry_unlock();
