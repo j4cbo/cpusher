@@ -2,3 +2,6 @@ test
 pusher-test
 preview-test
 *.dSYM
+xcuserdata/
+**/.DS_Store
+.DS_Store
