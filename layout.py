@@ -62,6 +62,11 @@ for mac, trees in config.items():
             x, y = tree['center']
             rotation = tree['rotation']
             pixel_locations += cluster6(x, y, rotation)
+        elif tree['type'] == 'densecluster8':
+            x, y = tree['center']
+            rotation = tree['rotation']
+            pixel_locations += densecluster8(x, y)
+            pixel_locations += densecluster8(x, y)
 
     print "{ 0x%06x, %d, {" % (mac, len(pixel_locations))
     for (x, y) in pixel_locations:
