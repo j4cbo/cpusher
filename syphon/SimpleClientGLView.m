@@ -87,7 +87,7 @@ rgb_t lookup_pixel(double x, double y) {
     if (xscale >= CLIENT_WINDOW_SIZE) xscale = CLIENT_WINDOW_SIZE;
     if (yscale < 0) yscale = 0;
     if (yscale >= CLIENT_WINDOW_SIZE) yscale = CLIENT_WINDOW_SIZE;
-    int idx = xscale * CLIENT_WINDOW_SIZE + yscale;
+    int idx = yscale * CLIENT_WINDOW_SIZE + xscale;
     uint32_t argb = pixelBuffer[idx];
     //NSLog(@"lookupPixel: %f %f -> %d %d -> 0x%08x\n", x, y, xscale, yscale, argb);
 
