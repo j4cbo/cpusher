@@ -45,13 +45,6 @@ static void registry_receive_broadcast(void * buf, int len) {
     int i;
     (void)len;
 
-    printf("MAC " MAC_FMT ", IP %d.%d.%d.%d, dev id %d, protocol %d, hardware rev %d, "
-           "software rev %d, link %d bps, %d pixels/strip, %d strips, port %d, %d strips/packet\n",
-        MAC_FMT_ARGS(pb->mac), (int)pb->ip[0], (int)pb->ip[1], (int)pb->ip[2], (int)pb->ip[3],
-        (int)pb->device_type, (int)pb->protocol, (int)pb->hardware_rev, (int)pb->software_rev,
-        (int)pb->link_speed, (int)pb->pixels_per_strip, (int)pb->strips_attached, (int)pb->my_port, (int)pb->max_strips_per_packet
-    );
-
     registry_lock();
 
     /* Is this a device we already know about? */
@@ -75,6 +68,13 @@ static void registry_receive_broadcast(void * buf, int len) {
     registry.pushers[i].last_seen = time(NULL);
     memcpy(&registry.pushers[i].last_broadcast, pb, sizeof *pb);
     registry.pushers[i].id = (pb->mac[3] << 16) | (pb->mac[4] << 8) | pb->mac[5];
+
+    printf("MAC " MAC_FMT ", IP %d.%d.%d.%d, dev id %d, protocol %d, hardware rev %d, "
+           "software rev %d, link %d bps, %d pixels/strip, %d strips, port %d, %d strips/packet\n",
+        MAC_FMT_ARGS(pb->mac), (int)pb->ip[0], (int)pb->ip[1], (int)pb->ip[2], (int)pb->ip[3],
+        (int)pb->device_type, (int)pb->protocol, (int)pb->hardware_rev, (int)pb->software_rev,
+        (int)pb->link_speed, (int)pb->pixels_per_strip, (int)pb->strips_attached, (int)pb->my_port, (int)pb->max_strips_per_packet
+    );
 
     printf("Found new pusher %x\n", registry.pushers[i].id);
 
