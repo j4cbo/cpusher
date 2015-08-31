@@ -82,7 +82,7 @@ rgb_t lookup_pixel(double x, double y) {
     }
 
     int xscale = ((x / 2) + .5) * CLIENT_WINDOW_SIZE;
-    int yscale = ((y / 2) + .5) * CLIENT_WINDOW_SIZE;
+    int yscale = ((-y / 2) + .5) * CLIENT_WINDOW_SIZE;
     if (xscale < 0) xscale = 0;
     if (xscale >= CLIENT_WINDOW_SIZE) xscale = CLIENT_WINDOW_SIZE;
     if (yscale < 0) yscale = 0;
