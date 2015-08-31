@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		169BB1771B9432E200C79FA7 /* layout.c in Sources */ = {isa = PBXBuildFile; fileRef = 169BB1761B9432E200C79FA7 /* layout.c */; };
 		169D621A1B87D75300EB23D7 /* Syphon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 169D62191B87D75300EB23D7 /* Syphon.framework */; };
 		169D621B1B87D79800EB23D7 /* Syphon.framework in Copy Syphon Framework */ = {isa = PBXBuildFile; fileRef = 169D62191B87D75300EB23D7 /* Syphon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16CCFF9E1B928A2000F6D83D /* registry.c in Sources */ = {isa = PBXBuildFile; fileRef = 16CCFF9C1B928A2000F6D83D /* registry.c */; };
 		16CCFFA11B928C6200F6D83D /* pattern.c in Sources */ = {isa = PBXBuildFile; fileRef = 16CCFF9F1B928C6200F6D83D /* pattern.c */; };
-		16CCFFA31B928C9500F6D83D /* layout.c in Sources */ = {isa = PBXBuildFile; fileRef = 16CCFFA21B928C9500F6D83D /* layout.c */; };
 		1B4F31B5120FBDBA00E90119 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1B4F31B4120FBDBA00E90119 /* icon.icns */; };
 		1BB5774A11CF205C008A305F /* SimpleClientGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BB5774811CF205C008A305F /* SimpleClientGLView.m */; };
 		1BB5777011CF2294008A305F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BB5776F11CF2294008A305F /* OpenGL.framework */; };
@@ -43,12 +43,12 @@
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		169BB1761B9432E200C79FA7 /* layout.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = layout.c; path = ../layout.c; sourceTree = "<group>"; };
 		169D62191B87D75300EB23D7 /* Syphon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Syphon.framework; sourceTree = "<group>"; };
 		16CCFF9C1B928A2000F6D83D /* registry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = registry.c; sourceTree = "<group>"; };
 		16CCFF9D1B928A2000F6D83D /* registry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = registry.h; sourceTree = "<group>"; };
 		16CCFF9F1B928C6200F6D83D /* pattern.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pattern.c; sourceTree = "<group>"; };
 		16CCFFA01B928C6200F6D83D /* pattern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pattern.h; sourceTree = "<group>"; };
-		16CCFFA21B928C9500F6D83D /* layout.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = layout.c; path = ../../cpp/layout.c; sourceTree = "<group>"; };
 		1B4F31B4120FBDBA00E90119 /* icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = icon.icns; sourceTree = "<group>"; };
 		1BB5774711CF205C008A305F /* SimpleClientGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleClientGLView.h; sourceTree = "<group>"; };
 		1BB5774811CF205C008A305F /* SimpleClientGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleClientGLView.m; sourceTree = "<group>"; };
@@ -141,7 +141,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				16CCFFA21B928C9500F6D83D /* layout.c */,
+				169BB1761B9432E200C79FA7 /* layout.c */,
 				16CCFF9F1B928C6200F6D83D /* pattern.c */,
 				16CCFFA01B928C6200F6D83D /* pattern.h */,
 				16CCFF9C1B928A2000F6D83D /* registry.c */,
@@ -248,7 +248,7 @@
 				16CCFFA11B928C6200F6D83D /* pattern.c in Sources */,
 				BDC63CDB13AFDF070097BBAD /* ToolbarDelegate.m in Sources */,
 				BDC63CEE13AFFE830097BBAD /* ServerDescriptionValueTransformer.m in Sources */,
-				16CCFFA31B928C9500F6D83D /* layout.c in Sources */,
+				169BB1771B9432E200C79FA7 /* layout.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
