@@ -39,7 +39,7 @@ def cluster8(x, y, rotation):
 def densecluster8(x, y):
     led_distance = .001
     for rot in range(8):
-        for dist in range(120):
+        for dist in range(160):
             yield(x + cos(rot * pi * 2 / 8) * led_distance * (dist + 10),
                   y + sin(rot * pi * 2 / 8) * led_distance * (dist + 10))
 
@@ -65,7 +65,6 @@ for mac, trees in config.items():
         elif tree['type'] == 'densecluster8':
             x, y = tree['center']
             rotation = tree['rotation']
-            pixel_locations += densecluster8(x, y)
             pixel_locations += densecluster8(x, y)
 
     print "{ 0x%06x, %d, {" % (mac, len(pixel_locations))
